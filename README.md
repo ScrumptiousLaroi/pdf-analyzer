@@ -12,7 +12,7 @@ To begin working with the PDF Analyzer project, you'll first need to **clone the
     Open your terminal or command prompt and run the following command:
 
     ```bash
-    git clone (https://github.com/huridocs/pdf-document-layout-analysis.git)
+    git clone https://github.com/huridocs/pdf-document-layout-analysis.git
     ```
 
 ## To Start Working on Your Project
