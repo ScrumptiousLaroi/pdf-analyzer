@@ -1,0 +1,30 @@
+{
+    "title": "Sample Document Title 4",
+    "outline": [
+        {
+            "level": "H1",
+            "text": "H1 Title 1",
+            "page": 1
+        },
+        {
+            "level": "H1",
+            "text": "H1 Title 2",
+            "page": 1
+        },
+        {
+            "level": "H2",
+            "text": "H2 Title 2",
+            "page": 1
+        },
+        {
+            "level": "H3",
+            "text": "H3 Title 1",
+            "page": 1
+        },
+        {
+            "level": "H3",
+            "text": "H3 Title 2",
+            "page": 1
+        }
+    ]
+}
