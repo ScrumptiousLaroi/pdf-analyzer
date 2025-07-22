@@ -2,6 +2,17 @@
 
 This section outlines the typical workflow for using your PDF Analyzer project.
 
+
+### To begin working with the PDF Analyzer project, you'll first need to **clone the model repository** from GitHub.
+
+ 1. **Open your terminal or command prompt and run the following command:
+
+```bash
+git clone https://github.com/huridocs/pdf-document-layout-analysis.git
++```
+ 
+ This section outlines the typical workflow for using your PDF Analyzer project.
+
 ### To Start Working on Your Project
 
 1.  **Start the HURIDOCS Docker Container:**
