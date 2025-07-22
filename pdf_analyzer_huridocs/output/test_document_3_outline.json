@@ -1,0 +1,50 @@
+{
+    "title": "Software Engineering Principles",
+    "outline": [
+        {
+            "level": "H1",
+            "text": "Chapter 1: Development Methodologies",
+            "page": 1
+        },
+        {
+            "level": "H2",
+            "text": "1.1 Agile Development",
+            "page": 1
+        },
+        {
+            "level": "H3",
+            "text": "1.1.1 Scrum Framework",
+            "page": 1
+        },
+        {
+            "level": "H3",
+            "text": "1.1.2 Kanban Method",
+            "page": 1
+        },
+        {
+            "level": "H2",
+            "text": "1.2 Waterfall Model",
+            "page": 1
+        },
+        {
+            "level": "H1",
+            "text": "Chapter 2: Code Quality and Testing",
+            "page": 1
+        },
+        {
+            "level": "H2",
+            "text": "2.1 Unit Testing",
+            "page": 1
+        },
+        {
+            "level": "H3",
+            "text": "2.1.1 Test-Driven Development",
+            "page": 1
+        },
+        {
+            "level": "H2",
+            "text": "2.2 Integration Testing",
+            "page": 1
+        }
+    ]
+}

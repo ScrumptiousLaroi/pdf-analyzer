@@ -1,0 +1,297 @@
+{
+    "individual_results": {
+        "test_document_1.pdf": {
+            "filename": "test_document_1.pdf",
+            "title_correct": true,
+            "title_details": "Expected: 'Machine Learning Fundamentals' | Actual: 'Machine Learning Fundamentals'",
+            "outline_metrics": {
+                "total_expected": 8,
+                "total_actual": 8,
+                "exact_matches": 8,
+                "level_matches": 8,
+                "text_matches": 8,
+                "page_matches": 8,
+                "missing_items": [],
+                "extra_items": [],
+                "level_errors": [],
+                "text_errors": [],
+                "page_errors": []
+            },
+            "scores": {
+                "precision": 100.0,
+                "recall": 100.0,
+                "f1": 100.0,
+                "exact_match_rate": 100.0
+            },
+            "success": true
+        },
+        "test_document_2.pdf": {
+            "filename": "test_document_2.pdf",
+            "title_correct": true,
+            "title_details": "Expected: 'Data Science Methods and Techniques' | Actual: 'Data Science Methods and Techniques'",
+            "outline_metrics": {
+                "total_expected": 8,
+                "total_actual": 8,
+                "exact_matches": 7,
+                "level_matches": 7,
+                "text_matches": 8,
+                "page_matches": 8,
+                "missing_items": [],
+                "extra_items": [],
+                "level_errors": [
+                    {
+                        "text": "Results and Discussion",
+                        "expected_level": "H1",
+                        "actual_level": "H2"
+                    }
+                ],
+                "text_errors": [],
+                "page_errors": []
+            },
+            "scores": {
+                "precision": 87.5,
+                "recall": 87.5,
+                "f1": 87.5,
+                "exact_match_rate": 87.5
+            },
+            "success": true
+        },
+        "test_document_3.pdf": {
+            "filename": "test_document_3.pdf",
+            "title_correct": true,
+            "title_details": "Expected: 'Software Engineering Principles' | Actual: 'Software Engineering Principles'",
+            "outline_metrics": {
+                "total_expected": 9,
+                "total_actual": 9,
+                "exact_matches": 9,
+                "level_matches": 9,
+                "text_matches": 9,
+                "page_matches": 9,
+                "missing_items": [],
+                "extra_items": [],
+                "level_errors": [],
+                "text_errors": [],
+                "page_errors": []
+            },
+            "scores": {
+                "precision": 100.0,
+                "recall": 100.0,
+                "f1": 100.0,
+                "exact_match_rate": 100.0
+            },
+            "success": true
+        },
+        "test_document_4.pdf": {
+            "filename": "test_document_4.pdf",
+            "title_correct": true,
+            "title_details": "Expected: 'Impact of Artificial Intelligence on Modern Healthcare' | Actual: 'Impact of Artificial Intelligence on Modern Healthcare'",
+            "outline_metrics": {
+                "total_expected": 10,
+                "total_actual": 10,
+                "exact_matches": 8,
+                "level_matches": 8,
+                "text_matches": 8,
+                "page_matches": 8,
+                "missing_items": [
+                    {
+                        "level": "H1",
+                        "text": "3. Methodology",
+                        "page": 1
+                    },
+                    {
+                        "level": "H1",
+                        "text": "Conclusion",
+                        "page": 1
+                    }
+                ],
+                "extra_items": [
+                    {
+                        "level": "H1",
+                        "text": "3. Methodology",
+                        "page": 2
+                    },
+                    {
+                        "level": "H1",
+                        "text": "Conclusion",
+                        "page": 2
+                    }
+                ],
+                "level_errors": [],
+                "text_errors": [],
+                "page_errors": []
+            },
+            "scores": {
+                "precision": 80.0,
+                "recall": 80.0,
+                "f1": 80.00000000000001,
+                "exact_match_rate": 80.0
+            },
+            "success": true
+        },
+        "test_document_5.pdf": {
+            "filename": "test_document_5.pdf",
+            "title_correct": true,
+            "title_details": "Expected: 'API Integration Guide' | Actual: 'API Integration Guide'",
+            "outline_metrics": {
+                "total_expected": 11,
+                "total_actual": 11,
+                "exact_matches": 3,
+                "level_matches": 3,
+                "text_matches": 9,
+                "page_matches": 9,
+                "missing_items": [
+                    {
+                        "level": "H2",
+                        "text": "Data Operations",
+                        "page": 1
+                    },
+                    {
+                        "level": "H1",
+                        "text": "Error Handling",
+                        "page": 1
+                    }
+                ],
+                "extra_items": [
+                    {
+                        "level": "H2",
+                        "text": "Data Operations",
+                        "page": 2
+                    },
+                    {
+                        "level": "H2",
+                        "text": "Error Handling",
+                        "page": 2
+                    }
+                ],
+                "level_errors": [
+                    {
+                        "text": "Getting Started",
+                        "expected_level": "H1",
+                        "actual_level": "H2"
+                    },
+                    {
+                        "text": "System Requirements",
+                        "expected_level": "H3",
+                        "actual_level": "H2"
+                    },
+                    {
+                        "text": "Installation Steps",
+                        "expected_level": "H3",
+                        "actual_level": "H2"
+                    },
+                    {
+                        "text": "API Endpoints",
+                        "expected_level": "H1",
+                        "actual_level": "H2"
+                    },
+                    {
+                        "text": "Creating Users",
+                        "expected_level": "H3",
+                        "actual_level": "H2"
+                    },
+                    {
+                        "text": "Updating User Information",
+                        "expected_level": "H3",
+                        "actual_level": "H2"
+                    }
+                ],
+                "text_errors": [],
+                "page_errors": []
+            },
+            "scores": {
+                "precision": 27.27272727272727,
+                "recall": 27.27272727272727,
+                "f1": 27.27272727272727,
+                "exact_match_rate": 27.27272727272727
+            },
+            "success": true
+        },
+        "test_document_6.pdf": {
+            "filename": "test_document_6.pdf",
+            "title_correct": true,
+            "title_details": "Expected: 'Q4 2024 Performance Analysis Report' | Actual: 'Q4 2024 Performance Analysis Report'",
+            "outline_metrics": {
+                "total_expected": 11,
+                "total_actual": 11,
+                "exact_matches": 3,
+                "level_matches": 3,
+                "text_matches": 9,
+                "page_matches": 9,
+                "missing_items": [
+                    {
+                        "level": "H1",
+                        "text": "What's Next for 2025?",
+                        "page": 1
+                    },
+                    {
+                        "level": "H2",
+                        "text": "Strategic Initiatives",
+                        "page": 1
+                    }
+                ],
+                "extra_items": [
+                    {
+                        "level": "H2",
+                        "text": "What's Next for 2025?",
+                        "page": 2
+                    },
+                    {
+                        "level": "H2",
+                        "text": "Strategic Initiatives",
+                        "page": 2
+                    }
+                ],
+                "level_errors": [
+                    {
+                        "text": "Executive Summary",
+                        "expected_level": "H1",
+                        "actual_level": "H2"
+                    },
+                    {
+                        "text": "Financial Performance",
+                        "expected_level": "H1",
+                        "actual_level": "H2"
+                    },
+                    {
+                        "text": "Product Sales",
+                        "expected_level": "H3",
+                        "actual_level": "H2"
+                    },
+                    {
+                        "text": "Service Revenue",
+                        "expected_level": "H3",
+                        "actual_level": "H2"
+                    },
+                    {
+                        "text": "Operational Metrics",
+                        "expected_level": "H1",
+                        "actual_level": "H2"
+                    },
+                    {
+                        "text": "Response Time Improvements",
+                        "expected_level": "H3",
+                        "actual_level": "H2"
+                    }
+                ],
+                "text_errors": [],
+                "page_errors": []
+            },
+            "scores": {
+                "precision": 27.27272727272727,
+                "recall": 27.27272727272727,
+                "f1": 27.27272727272727,
+                "exact_match_rate": 27.27272727272727
+            },
+            "success": true
+        }
+    },
+    "overall_scores": {
+        "precision": 70.3409090909091,
+        "recall": 70.3409090909091,
+        "f1": 70.3409090909091,
+        "exact_match_rate": 70.3409090909091
+    },
+    "title_accuracy": 100.0,
+    "documents_tested": 6,
+    "successful_tests": 6
+}

@@ -1,0 +1,55 @@
+{
+    "title": "Impact of Artificial Intelligence on Modern Healthcare",
+    "outline": [
+        {
+            "level": "H1",
+            "text": "Abstract",
+            "page": 1
+        },
+        {
+            "level": "H1",
+            "text": "1. Introduction",
+            "page": 1
+        },
+        {
+            "level": "H2",
+            "text": "1.1 Background and Motivation",
+            "page": 1
+        },
+        {
+            "level": "H3",
+            "text": "1.1.1 Current Healthcare Challenges",
+            "page": 1
+        },
+        {
+            "level": "H2",
+            "text": "1.2 Research Objectives",
+            "page": 1
+        },
+        {
+            "level": "H1",
+            "text": "2. Literature Review",
+            "page": 1
+        },
+        {
+            "level": "H2",
+            "text": "2.1 AI in Medical Imaging",
+            "page": 1
+        },
+        {
+            "level": "H3",
+            "text": "2.1.1 Deep Learning Applications",
+            "page": 1
+        },
+        {
+            "level": "H1",
+            "text": "3. Methodology",
+            "page": 2
+        },
+        {
+            "level": "H1",
+            "text": "Conclusion",
+            "page": 2
+        }
+    ]
+}

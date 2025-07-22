@@ -1,0 +1,45 @@
+{
+    "title": "Machine Learning Fundamentals",
+    "outline": [
+        {
+            "level": "H1",
+            "text": "1. Introduction to Machine Learning",
+            "page": 1
+        },
+        {
+            "level": "H2",
+            "text": "1.1 What is Machine Learning?",
+            "page": 1
+        },
+        {
+            "level": "H3",
+            "text": "1.1.1 Types of Learning",
+            "page": 1
+        },
+        {
+            "level": "H3",
+            "text": "1.1.2 Applications",
+            "page": 1
+        },
+        {
+            "level": "H1",
+            "text": "2. Supervised Learning",
+            "page": 1
+        },
+        {
+            "level": "H2",
+            "text": "2.1 Classification",
+            "page": 1
+        },
+        {
+            "level": "H3",
+            "text": "2.1.1 Decision Trees",
+            "page": 1
+        },
+        {
+            "level": "H2",
+            "text": "2.2 Regression",
+            "page": 1
+        }
+    ]
+}

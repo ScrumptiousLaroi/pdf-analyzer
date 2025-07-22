@@ -1,0 +1,45 @@
+{
+    "title": "Data Science Methods and Techniques",
+    "outline": [
+        {
+            "level": "H1",
+            "text": "Abstract",
+            "page": 1
+        },
+        {
+            "level": "H1",
+            "text": "Introduction",
+            "page": 1
+        },
+        {
+            "level": "H2",
+            "text": "Data Collection Methods",
+            "page": 1
+        },
+        {
+            "level": "H2",
+            "text": "Survey Design",
+            "page": 1
+        },
+        {
+            "level": "H2",
+            "text": "Web Scraping",
+            "page": 1
+        },
+        {
+            "level": "H2",
+            "text": "Data Analysis Techniques",
+            "page": 1
+        },
+        {
+            "level": "H2",
+            "text": "Exploratory Data Analysis",
+            "page": 1
+        },
+        {
+            "level": "H1",
+            "text": "Results and Discussion",
+            "page": 1
+        }
+    ]
+}
