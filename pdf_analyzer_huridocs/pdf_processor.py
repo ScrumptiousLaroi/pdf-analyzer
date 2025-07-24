@@ -158,96 +158,71 @@ def analyze_font_sizes(segments: list) -> dict:
 
     return thresholds
 
-# --- Function to Classify Header Level (Optimized for Accuracy) ---
-def classify_header_level(text: str, font_height: float, font_name: str, segment_type: str, thresholds: dict, page_num: int = 1) -> str:
+# --- Function to Determine Header Level (Fixed Logic) ---
+def determine_header_level(text: str, font_height: float, font_thresholds: dict, confidence_score: float) -> str:
     """
-    Classifies a section header into H1, H2, or H3 based on multiple factors.
-    Optimized for high accuracy based on test data patterns.
+    Determines header level (H1, H2, H3) based primarily on font size, with content patterns as secondary factors.
+    Font size is the most reliable indicator of hierarchy.
     """
     
     text_clean = text.strip()
     text_length = len(text_clean)
-    text_lower = text_clean.lower()
     
-    # Initialize scoring
-    h1_score = 0
-    h2_score = 0
-    h3_score = 0
+    # Get font size thresholds
+    h1_threshold = font_thresholds.get('h1_threshold', 15)
+    h2_threshold = font_thresholds.get('h2_threshold', 13) 
+    h3_threshold = font_thresholds.get('h3_threshold', 11)
+    body_size = font_thresholds.get('body_text_size', 10)
     
-    # Factor 1: Content pattern analysis (most reliable)
-    # Strong H1 indicators
-    if re.match(r'^\d+\.?\s+[A-Z]', text_clean):  # "1. Introduction", "2. Method"
-        h1_score += 4
-    elif text_lower in ['abstract', 'introduction', 'background', 'method', 'methods', 
-                       'methodology', 'results', 'discussion', 'conclusion', 'conclusions',
-                       'references', 'bibliography', 'acknowledgements', 'overview',
-                       'revision history', 'table of contents']:
-        h1_score += 3
-    elif re.match(r'^[A-Z][A-Z\s\-]+$', text_clean) and text_length <= 40:  # ALL CAPS
-        h1_score += 2
-    
-    # H2 indicators
-    if re.match(r'^\d+\.\d+\.?\s+[A-Z]', text_clean):  # "2.1. Data", "3.1 Analysis"
-        h2_score += 4
-    elif text_lower.startswith(('summary', 'timeline', 'equitable access', 'shared decision')):
-        h2_score += 2
-    
-    # H3 indicators
-    if re.match(r'^\d+\.\d+\.\d+\.?\s+[A-Z]', text_clean):  # "2.1.1 Types"
-        h3_score += 4
-    elif text_clean.endswith(':') and text_length <= 30:  # "Timeline:", "Background:"
-        h3_score += 2
-    
-    # Factor 2: Font size analysis
-    h1_threshold = thresholds.get('h1_threshold', 15)
-    h2_threshold = thresholds.get('h2_threshold', 13)
-    h3_threshold = thresholds.get('h3_threshold', 11)
-    
+    # Primary classification: Font Size (most reliable)
     if font_height >= h1_threshold:
-        h1_score += 2
+        base_level = "H1"
     elif font_height >= h2_threshold:
-        h2_score += 2
+        base_level = "H2"
     elif font_height >= h3_threshold:
-        h3_score += 2
-    
-    # Factor 3: Bold formatting
-    font_name_lower = font_name.lower() if font_name else ""
-    if any(indicator in font_name_lower for indicator in ['bold', 'heavy', 'black']):
-        h1_score += 1
-        h2_score += 1
-        h3_score += 1
-    
-    # Factor 4: HURIDOCS type hints
-    if segment_type == "Section header":
-        h1_score += 1
-        h2_score += 1
-    
-    # Factor 5: Text length consideration
-    if text_length <= 20:  # Very short - likely higher level
-        h1_score += 1
-    elif text_length <= 40:  # Medium - could be any level
-        h2_score += 1
-    
-    # Decision logic - choose the level with highest score, but be conservative
-    max_score = max(h1_score, h2_score, h3_score)
-    
-    # Require minimum confidence threshold
-    if max_score < 2:
-        return None  # Not confident enough to classify as header
-    
-    # Determine level based on scores
-    if h1_score == max_score and h1_score >= 3:
-        return "H1"
-    elif h2_score == max_score and h2_score >= 2:
-        return "H2"
-    elif h3_score == max_score and h3_score >= 2:
-        return "H3"
-    elif max_score >= 3:  # Default to H1 for high-confidence cases
-        return "H1"
-    elif max_score >= 2:  # Default to H2 for medium-confidence cases
-        return "H2"
+        base_level = "H3"
     else:
-        return None  # Not confident enough
+        # Too small to be a header
+        return None
+    
+    # Secondary adjustment: Content patterns can modify the base level
+    content_adjustment = 0
+    
+    # Strong H1 content patterns
+    if re.match(r'^\d+\.?\s+[A-Z]', text_clean):  # "1. Introduction", "2. Method"
+        content_adjustment = -1  # Promote to higher level (H1)
+    elif text_clean.lower() in ['abstract', 'introduction', 'background', 'method', 'methods', 
+                               'methodology', 'results', 'discussion', 'conclusion', 'conclusions',
+                               'references', 'bibliography', 'acknowledgements', 'overview']:
+        content_adjustment = -1  # Promote to H1
+    elif re.match(r'^[A-Z][A-Z\s\-]+$', text_clean) and text_length <= 40:  # ALL CAPS
+        content_adjustment = -1  # Promote to H1
+    
+    # H2 content patterns
+    elif re.match(r'^\d+\.\d+\.?\s+[A-Z]', text_clean):  # "2.1. Data", "3.1 Analysis"
+        if base_level == "H1":
+            content_adjustment = 1  # Demote to H2
+    
+    # H3 content patterns  
+    elif re.match(r'^\d+\.\d+\.\d+\.?\s+[A-Z]', text_clean):  # "2.1.1 Types"
+        if base_level in ["H1", "H2"]:
+            content_adjustment = 2 if base_level == "H1" else 1  # Demote to H3
+    elif text_clean.endswith(':') and text_length <= 30:  # "Timeline:", "Background:"
+        if base_level == "H1":
+            content_adjustment = 2  # Demote to H3
+        elif base_level == "H2":
+            content_adjustment = 1  # Demote to H3
+    
+    # Apply content-based adjustment
+    level_map = {"H1": 1, "H2": 2, "H3": 3}
+    final_level_num = level_map[base_level] + content_adjustment
+    
+    # Ensure we stay within valid range
+    final_level_num = max(1, min(3, final_level_num))
+    
+    # Convert back to string
+    reverse_map = {1: "H1", 2: "H2", 3: "H3"}
+    return reverse_map[final_level_num]
 
 # --- Function to Organize Document Outline (Generalized Robust Algorithm) ---
 def organize_document_outline(huridocs_segments: list) -> dict:
@@ -266,86 +241,102 @@ def organize_document_outline(huridocs_segments: list) -> dict:
 
     # --- ROBUST TITLE EXTRACTION ---
     def extract_document_title():
-        """Extract document title using multiple strategies"""
+        """Extract document title using improved strategies prioritizing bold, centered, and large text"""
         
-        # Strategy 1: Look for explicit Title type
-        title_segments = [s for s in huridocs_segments[:20] if s.get("type") == "Title"]
+        # Get first page segments only for title detection
+        page_1_segments = [s for s in huridocs_segments if s.get("page_number", 1) == 1]
+        if not page_1_segments:
+            return ""
+        
+        # Strategy 1: Look for explicit Title type segments
+        title_segments = [s for s in page_1_segments if s.get("type") == "Title"]
         if title_segments:
-            # Use the largest title on first page, or first title found
-            page_1_titles = [t for t in title_segments if t.get("page_number", 1) == 1]
-            if page_1_titles:
-                best_title = max(page_1_titles, key=lambda x: x.get("height", 0))
+            # Use the largest title, preferably bold
+            best_title = None
+            for title in title_segments:
+                font_name = title.get("font_name", "").lower()
+                is_bold = any(indicator in font_name for indicator in ['bold', 'heavy', 'black'])
+                
+                if best_title is None:
+                    best_title = title
+                elif is_bold and not any(indicator in best_title.get("font_name", "").lower() 
+                                       for indicator in ['bold', 'heavy', 'black']):
+                    best_title = title  # Prefer bold titles
+                elif title.get("height", 0) > best_title.get("height", 0):
+                    best_title = title  # Prefer larger titles
+            
+            if best_title:
                 return best_title["text"].strip()
-            return title_segments[0]["text"].strip()
         
-        # Strategy 2: Look for section headers that could be titles
-        section_headers = [s for s in huridocs_segments[:15] if s.get("type") == "Section header"]
+        # Strategy 2: Look for bold text segments that could be titles
+        bold_segments = []
+        for segment in page_1_segments:
+            font_name = segment.get("font_name", "").lower()
+            text = segment.get("text", "").strip()
+            
+            # Check if text is bold
+            is_bold = any(indicator in font_name for indicator in ['bold', 'heavy', 'black'])
+            
+            # Check if text is reasonably title-like
+            is_title_like = (
+                len(text) > 3 and len(text) < 200 and  # Reasonable length
+                not text.isdigit() and  # Not just numbers
+                not text.startswith("ADDRESS:") and  # Not address
+                not re.match(r'^page\s+\d+', text.lower()) and  # Not page numbers
+                not text.lower() in ['the', 'and', 'of', 'to', 'for', 'a', 'an']  # Not articles
+            )
+            
+            if is_bold and is_title_like:
+                bold_segments.append(segment)
+        
+        # If we have bold segments, pick the best one (highest on page, largest)
+        if bold_segments:
+            # Sort by position (top of page) and then by size
+            bold_segments.sort(key=lambda x: (x.get("top", 999), -x.get("height", 0)))
+            best_bold = bold_segments[0]
+            
+            # Additional check: if it's very high on the page and reasonably sized, use it
+            if best_bold.get("top", 999) < 200:  # High on page
+                return best_bold["text"].strip()
+        
+        # Strategy 3: Look for large text on first page (non-bold fallback)
+        heights = [s.get("height", 0) for s in page_1_segments if s.get("height", 0) > 0]
+        if heights:
+            max_height = max(heights)
+            avg_height = sum(heights) / len(heights)
+            
+            # Find segments with significantly large text
+            large_segments = [s for s in page_1_segments 
+                            if s.get("height", 0) >= max_height * 0.8 and  # Close to max size
+                               len(s.get("text", "").strip()) > 5 and
+                               len(s.get("text", "").strip()) < 200]
+            
+            if large_segments:
+                # Take the one highest on the page
+                best_candidate = min(large_segments, key=lambda x: x.get("top", 999))
+                candidate_text = best_candidate.get("text", "").strip()
+                
+                # Only use if it looks like a title
+                if (not candidate_text.startswith("ADDRESS:") and
+                    not re.match(r'^\d+\s', candidate_text) and  # Not starting with numbers
+                    not candidate_text.lower().startswith('page ')):
+                    return candidate_text
+        
+        # Strategy 4: Look for section headers that might be titles
+        section_headers = [s for s in page_1_segments[:10] if s.get("type") == "Section header"]
         if section_headers:
             first_header = section_headers[0]
             text = first_header.get("text", "").strip()
             
             # Check if this looks like a document title vs. a section header
-            title_indicators = ["application", "form", "proposal", "request", "overview", 
-                              "report", "study", "analysis", "guide", "manual", "plan", "stem", "pathways"]
+            title_indicators = ["introduction to", "overview of", "guide to", "manual for", 
+                              "handbook", "report on", "analysis of", "study of"]
             
             if any(indicator in text.lower() for indicator in title_indicators):
-                # If we have multiple section headers on page 1, check if they should be combined
-                page_1_headers = [h for h in section_headers if h.get("page_number", 1) == 1]
-                if len(page_1_headers) >= 2:
-                    first_text = page_1_headers[0].get("text", "").strip()
-                    second_text = page_1_headers[1].get("text", "").strip()
-                    
-                    # Check if they should be combined (both short, complementary, no sentence endings)
-                    if (len(first_text) <= 50 and len(second_text) <= 50 and
-                        not first_text.endswith('.') and not second_text.endswith('.') and
-                        len(first_text.split()) <= 3 and len(second_text.split()) <= 5):
-                        return f"{first_text}  {second_text}  "
-                
-                # For any form of application/form, clean up common administrative suffixes
-                if "application" in text.lower() and "form" in text.lower():
-                    # Filter out administrative terms that aren't part of the core title
-                    words = text.split()
-                    filtered_words = []
-                    skip_words = ["service", "department", "office", "ministry", "govt", "government"]
-                    for word in words:
-                        if word.lower() not in skip_words:
-                            filtered_words.append(word)
-                    clean_title = " ".join(filtered_words)
-                    return clean_title + "  " if clean_title else text
-                
                 return text
         
-        # Strategy 3: Look for large text on first page
-        page_1_segments = [s for s in huridocs_segments if s.get("page_number", 1) == 1]
-        if page_1_segments:
-            # Find text significantly larger than average
-            heights = [s.get("height", 0) for s in page_1_segments if s.get("height", 0) > 0]
-            if heights:
-                avg_height = sum(heights) / len(heights)
-                large_segments = [s for s in page_1_segments 
-                                if s.get("height", 0) > avg_height * 1.4 and
-                                   len(s.get("text", "").strip()) > 5]
-                
-                if large_segments:
-                    # Take the one highest on the page
-                    best_candidate = min(large_segments, key=lambda x: x.get("top", 999))
-                    candidate_text = best_candidate.get("text", "").strip()
-                    
-                    # Only use if it looks like a title (not too long, not an address)
-                    if (len(candidate_text) <= 150 and 
-                        not candidate_text.startswith("ADDRESS:") and
-                        not re.match(r'^\d+\s', candidate_text)):  # Not starting with numbers
-                        
-                        # For RFP documents, add prefix if it mentions proposal
-                        if ("proposal" in candidate_text.lower() and 
-                            "developing" in candidate_text.lower() and
-                            not candidate_text.startswith("RFP")):
-                            return f"RFP:Request for Proposal {candidate_text}  "
-                        
-                        return candidate_text
-        
-        # Strategy 4: Check for special document types that should have empty titles
-        first_few_segments = [s.get("text", "") for s in huridocs_segments[:5]]
+        # Strategy 5: Check for special document types that should have empty titles
+        first_few_segments = [s.get("text", "") for s in page_1_segments[:5]]
         all_text = " ".join(first_few_segments).lower()
         
         # Address/location documents often should have empty titles  
@@ -359,7 +350,7 @@ def organize_document_outline(huridocs_segments: list) -> dict:
     
     # --- ROBUST OUTLINE EXTRACTION ---
     def extract_outline():
-        """Extract outline using generalized patterns"""
+        """Extract outline using improved font-size based hierarchy"""
         items = []
         
         # Skip title text in outline extraction
@@ -377,16 +368,21 @@ def organize_document_outline(huridocs_segments: list) -> dict:
             page = segment.get("page_number", 1)
             segment_type = segment.get("type", "")
             height = segment.get("height", 0)
+            font_name = segment.get("font_name", "")
             
             # Skip empty text, title text, or simple page numbers
             if not text or text == title_text or text in title_text or text.isdigit():
+                continue
+            
+            # Skip very short fragments and common words
+            if len(text) <= 2 or text.lower() in ['the', 'and', 'of', 'to', 'for', 'a', 'an']:
                 continue
             
             # Determine if this could be a header
             is_header_candidate = False
             confidence_score = 0
             
-            # Type-based evidence
+            # Type-based evidence (strong indicators)
             if segment_type == "Section header":
                 is_header_candidate = True
                 confidence_score += 3
@@ -394,16 +390,22 @@ def organize_document_outline(huridocs_segments: list) -> dict:
                 is_header_candidate = True
                 confidence_score += 2
             
+            # Bold formatting evidence (important for headers)
+            font_name_lower = font_name.lower()
+            is_bold = any(indicator in font_name_lower for indicator in ['bold', 'heavy', 'black'])
+            if is_bold:
+                confidence_score += 2
+                is_header_candidate = True
+            
             # Content pattern evidence
             text_patterns = [
-                (r'^\d+\.?\s+[A-Z]', 3),  # "1. Introduction", "2. Method"
-                (r'^\d+\.\d+\.?\s+[A-Z]', 2),  # "2.1. Analysis"
-                (r'^\d+\.\d+\.\d+\.?\s+[A-Z]', 1),  # "2.1.1 Details"
-                (r'^[A-Z][A-Z\s\-]{2,30}$', 2),  # "SUMMARY", "TABLE OF CONTENTS"
-                (r'^(Chapter|Section|Part)\s+\d+', 3),  # "Chapter 1", "Section 2"
-                (r'^(Abstract|Introduction|Background|Method|Results|Discussion|Conclusion|References)$', 2),
+                (r'^\d+\.?\s+[A-Z]', 4),  # "1. Introduction", "2. Method"
+                (r'^\d+\.\d+\.?\s+[A-Z]', 3),  # "2.1. Analysis"
+                (r'^\d+\.\d+\.\d+\.?\s+[A-Z]', 2),  # "2.1.1 Details"
+                (r'^[A-Z][A-Z\s\-]{2,30}$', 3),  # "SUMMARY", "TABLE OF CONTENTS"
+                (r'^(Chapter|Section|Part)\s+\d+', 4),  # "Chapter 1", "Section 2"
+                (r'^(Abstract|Introduction|Background|Method|Results|Discussion|Conclusion|References)$', 3),
                 (r'^(Appendix\s+[A-Z]:|Appendix\s+[A-Z]\s)', 2),  # "Appendix A:", "Appendix B "
-                (r'^(Revision\s+History|Table\s+of\s+Contents|Acknowledgements?)$', 2),  # Common document sections
             ]
             
             for pattern, score in text_patterns:
@@ -412,134 +414,61 @@ def organize_document_outline(huridocs_segments: list) -> dict:
                     confidence_score += score
                     break
             
-            # Font size evidence (relative to document)
+            # Font size evidence (primary hierarchy indicator)
             body_size = font_thresholds.get('body_text_size', 10)
-            if height > body_size * 1.5:
+            h3_threshold = font_thresholds.get('h3_threshold', 11)
+            
+            if height >= h3_threshold:  # Must be at least H3 size to be a header
                 confidence_score += 2
-            elif height > body_size * 1.2:
-                confidence_score += 1
+                is_header_candidate = True
+                
+                if height > body_size * 1.5:
+                    confidence_score += 2  # Significantly larger than body text
+                elif height > body_size * 1.2:
+                    confidence_score += 1  # Moderately larger than body text
             
             # Length evidence (headers are typically shorter than body paragraphs)
             if len(text) <= 60:
                 confidence_score += 1
             elif len(text) > 120:
-                confidence_score -= 2
-            
-            # Bold formatting evidence
-            font_name = segment.get("font_name", "").lower()
-            if any(indicator in font_name for indicator in ['bold', 'heavy', 'black']):
-                confidence_score += 1
+                confidence_score -= 2  # Too long to be a header
             
             # Position evidence (early in document = more likely to be header)
             if page <= 2:
                 confidence_score += 0.5
             
-            # Colon ending (often indicates subsection)
+            # Special formatting evidence
             if text.endswith(':'):
                 confidence_score += 1
-            
-            # Question format
             if text.endswith('?') and len(text) <= 80:
                 confidence_score += 1
             
-            # Special text patterns that suggest headers
-            if any(phrase in text.lower() for phrase in ['pathway', 'timeline', 'summary', 'background']):
-                confidence_score += 0.5
-                
-            # Avoid numbered list items that start with bullets or numbers followed by periods but are long
-            if (re.match(r'^[\d\•●]\.\s+.{50,}', text) and len(text) > 80):
-                confidence_score -= 3  # Likely a list item, not a header
-            
-            # Apply document-specific filtering strategies
+            # Apply document-specific filtering
             required_confidence = 3  # Base requirement
             
             if doc_type == "academic":
-                # Academic papers: be more selective, higher confidence threshold
                 required_confidence = 4
-                # Skip very common academic terms that aren't headers
-                skip_terms = ["et al", "figure", "table", "ref.", "pp.", "vol.", "no.", "professionals who"]
+                # Skip common academic terms that aren't headers
+                skip_terms = ["et al", "figure", "table", "ref.", "pp.", "vol.", "no."]
                 if any(term in text.lower() for term in skip_terms):
                     continue
             elif doc_type == "rfp":
-                # RFP documents: moderate selectivity, but filter out administrative text
                 required_confidence = 4
                 # Skip dates and administrative text
-                if re.match(r'^\w+\s+\d{1,2},?\s+\d{4}', text):  # Dates
+                if re.match(r'^\w+\s+\d{1,2},?\s+\d{4}', text):
                     continue
-                # Skip very short fragments
-                if len(text) <= 3:
-                    continue
-                # Skip common non-header phrases
-                skip_phrases = ["the", "and", "of", "to", "for"]
-                if any(phrase == text.lower().strip() for phrase in skip_phrases):
-                    continue
-                # Skip segments that are just punctuation or numbers
                 if re.match(r'^[\d\s\.\-\:]+$', text):
                     continue
-            elif doc_type == "stem":
-                # STEM documents: Look for educational content headers
-                required_confidence = 3
-                # Must contain educational keywords
-                if not any(keyword in text.lower() for keyword in ['pathway', 'program', 'course', 'credit', 'gpa', 'student']):
-                    required_confidence += 1  # Higher bar if no educational keywords
-            elif doc_type == "flyer":
-                # Flyers: Look for event/promotional headers
-                required_confidence = 2
-                # Look for typical flyer content
-                if any(keyword in text.upper() for keyword in ['HOPE', 'SEE', 'THERE', 'RSVP', 'ADDRESS', 'JOIN', 'COME', 'VISIT']):
-                    # Clean up spacing for display text - common in flyers due to design fonts
-                    clean_text = re.sub(r'\s+', ' ', text)  # Normalize spaces
-                    
-                    # Fix common OCR spacing issues in decorative fonts
-                    # Pattern: single letters separated by spaces should be joined
-                    words = clean_text.split()
-                    fixed_words = []
-                    i = 0
-                    while i < len(words):
-                        word = words[i]
-                        # Check if this is a single letter that should be joined with next letters
-                        if (len(word) == 1 and i + 1 < len(words) and 
-                            len(words[i + 1]) == 1 and word.isalpha()):
-                            # Collect consecutive single letters
-                            combined = word
-                            j = i + 1
-                            while (j < len(words) and len(words[j]) == 1 and 
-                                   (words[j].isalpha() or words[j] in '!?.')):
-                                combined += words[j]
-                                j += 1
-                            fixed_words.append(combined)
-                            i = j
-                        else:
-                            fixed_words.append(word)
-                            i += 1
-                    
-                    clean_text = ' '.join(fixed_words)
-                    # Remove space before punctuation
-                    clean_text = re.sub(r'\s+([!?.])', r'\1', clean_text)
-                    
-                    items.append({
-                        "level": "H1",
-                        "text": clean_text + " ",
-                        "page": 0
-                    })
-                    return items  # Only one header expected for flyers
-                    
-            # Only include if we have reasonable confidence
-            if is_header_candidate and confidence_score >= required_confidence:
-                # Determine hierarchy level
+            
+            # Only include if we have reasonable confidence and meet font size requirement
+            if is_header_candidate and confidence_score >= required_confidence and height >= h3_threshold:
+                # Determine hierarchy level based primarily on font size
                 level = determine_header_level(text, height, font_thresholds, confidence_score)
                 if level:
-                    # Adjust page numbering based on document type
-                    adjusted_page = page
-                    if doc_type == "academic" and page > 1:
-                        adjusted_page = page - 1  # Academic papers often need page adjustment
-                    elif doc_type == "stem":
-                        adjusted_page = 0  # STEM documents may use different page numbering
-                    
                     items.append({
                         "level": level,
-                        "text": text + (" " if not text.endswith(" ") else ""),
-                        "page": adjusted_page
+                        "text": text,
+                        "page": page
                     })
         
         return items
